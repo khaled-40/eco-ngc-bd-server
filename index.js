@@ -84,6 +84,13 @@ app.get('/issues/:category', async (req, res) => {
   }
 });
 
+app.get('/latest-issues', async (req, res) => {
+    const { issuesCollection } = await getCollections();
+    const cursor = issuesCollection.find().sort({ date: -1 }).limit(6);
+    const result = await cursor.toArray();
+    res.send(result);
+})
+
 
 app.listen(port, () => {
   console.log(`eco-ngc-bd server is running on port ${port}`)
