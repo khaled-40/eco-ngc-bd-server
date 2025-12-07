@@ -49,12 +49,18 @@ app.get('/', (req, res) => {
   res.send('eco-ngc-bd server is running')
 })
 
-app.get("/test-insert", async (req, res) => {
-    const { issuesCollection } = await getCollections();
-    const result = await issuesCollection.insertOne({ message: "hello world", createdAt: new Date() });
-    res.send(result);
-});
+// app.get("/test-insert", async (req, res) => {
+//     const { issuesCollection } = await getCollections();
+//     const result = await issuesCollection.insertOne({ message: "hello world", createdAt: new Date() });
+//     res.send(result);
+// });
 
+app.get('/issues', async(req,res) => {
+  const {issuesCollection} = getCollections();
+  const cursor = issuesCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+});
 
 app.listen(port, () => {
   console.log(`eco-ngc-bd server is running on port ${port}`)
