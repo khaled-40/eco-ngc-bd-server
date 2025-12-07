@@ -27,20 +27,20 @@ const client = new MongoClient(uri, {
 let issuesCollection, contributionCollection, usersCollection;
 
 async function getCollections() {
-    if (issuesCollection) return { issuesCollection, contributionCollection, usersCollection };
+  if (issuesCollection) return { issuesCollection, contributionCollection, usersCollection };
 
-    await client.connect();
+  await client.connect();
 
-    // 🔥 Ping the admin DB to make sure connection is successful
-    await client.db("admin").command({ ping: 1 });
-    console.log("MongoDB Ping Success — Connected to cluster!");
+  // 🔥 Ping the admin DB to make sure connection is successful
+  await client.db("admin").command({ ping: 1 });
+  console.log("MongoDB Ping Success — Connected to cluster!");
 
-    const db = client.db('ecoCleanDB');
-    issuesCollection = db.collection('issues');
-    contributionCollection = db.collection('contribution');
-    usersCollection = db.collection('users');
-    console.log('MongoDB connected (reused on next calls)');
-    return { issuesCollection, contributionCollection, usersCollection };
+  const db = client.db('ecoCleanDB');
+  issuesCollection = db.collection('issues');
+  contributionCollection = db.collection('contribution');
+  usersCollection = db.collection('users');
+  console.log('MongoDB connected (reused on next calls)');
+  return { issuesCollection, contributionCollection, usersCollection };
 }
 
 getCollections().catch(console.error);
@@ -55,8 +55,11 @@ app.get('/', (req, res) => {
 //     res.send(result);
 // });
 
-app.get('/issues', async(req,res) => {
-  const {issuesCollection} =await getCollections();
+
+// Issues Related APIS 
+
+app.get('/issues', async (req, res) => {
+  const { issuesCollection } = await getCollections();
   const cursor = issuesCollection.find();
   const result = await cursor.toArray();
   res.send(result);
@@ -64,45 +67,50 @@ app.get('/issues', async(req,res) => {
 
 app.get('/issues/:id', async (req, res) => {
 
-    const { issuesCollection } = await getCollections();
-    const id = req.params.id;
-    console.log("Requested ID:", id);
+  const { issuesCollection } = await getCollections();
+  const id = req.params.id;
+  console.log("Requested ID:", id);
 
-    // Convert string to ObjectId
-    const query = { _id: new ObjectId(id) };
+  // Convert string to ObjectId
+  const query = { _id: new ObjectId(id) };
 
-    const result = await issuesCollection.findOne(query);
-    res.send(result);
+  const result = await issuesCollection.findOne(query);
+  res.send(result);
 
 });
 
 app.get('/issues/:category', async (req, res) => {
-  try {
-    const { category } = req.params;              // Get category from URL
-    const { issuesCollection } = await getCollections();
+  const { category } = req.params;              // Get category from URL
+  const { issuesCollection } = await getCollections();
 
-    // Find all issues matching the category (case-insensitive)
-    const result = await issuesCollection
-      .find({ category:category })
-      .toArray();
-
-    if (result.length === 0) {
-      return res.status(404).send({ message: `No issues found for category: ${category}` });
-    }
-
-    res.send(result);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Server error' });
-  }
+  // Find all issues matching the category (case-insensitive)
+  const result = await issuesCollection
+    .find({ category: category })
+    .toArray();
+  res.send(result);
 });
 
 app.get('/latest-issues', async (req, res) => {
-    const { issuesCollection } = await getCollections();
-    const cursor = issuesCollection.find().sort({ date: -1 }).limit(6);
-    const result = await cursor.toArray();
-    res.send(result);
+  const { issuesCollection } = await getCollections();
+  const cursor = issuesCollection.find().sort({ date: -1 }).limit(6);
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
+// Contribution Related APIS 
+
+app.get('/contributions', async (req, res) => {
+  console.log(req.query.email)
+  const { contributionCollection } = await getCollections();
+  // console.log('headers', req.headers)
+  const email = req.query.email;
+  const query = {};
+  if (email) {
+    query.email = email
+  }
+  const cursor = contributionCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
 })
 
 
