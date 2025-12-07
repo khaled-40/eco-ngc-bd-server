@@ -56,11 +56,34 @@ app.get('/', (req, res) => {
 // });
 
 app.get('/issues', async(req,res) => {
-  const {issuesCollection} = getCollections();
+  const {issuesCollection} =await getCollections();
   const cursor = issuesCollection.find();
   const result = await cursor.toArray();
   res.send(result);
 });
+
+app.get('/issues/:category', async (req, res) => {
+  try {
+    const { category } = req.params;              // Get category from URL
+    const { issuesCollection } = await getCollections();
+
+    // Find all issues matching the category (case-insensitive)
+    const result = await issuesCollection
+      .find({ category:category })
+      .toArray();
+
+    if (result.length === 0) {
+      return res.status(404).send({ message: `No issues found for category: ${category}` });
+    }
+
+    res.send(result);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`eco-ngc-bd server is running on port ${port}`)
