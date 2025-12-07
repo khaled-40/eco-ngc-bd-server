@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 3000;
 
@@ -50,8 +50,8 @@ app.get('/', (req, res) => {
 })
 
 // app.get("/test-insert", async (req, res) => {
-//     const { issuesCollection } = await getCollections();
-//     const result = await issuesCollection.insertOne({ message: "hello world", createdAt: new Date() });
+//     const { contributionCollection } = await getCollections();
+//     const result = await contributionCollection.insertOne({ message: "hello world", createdAt: new Date() });
 //     res.send(result);
 // });
 
@@ -60,6 +60,20 @@ app.get('/issues', async(req,res) => {
   const cursor = issuesCollection.find();
   const result = await cursor.toArray();
   res.send(result);
+});
+
+app.get('/issues/:id', async (req, res) => {
+
+    const { issuesCollection } = await getCollections();
+    const id = req.params.id;
+    console.log("Requested ID:", id);
+
+    // Convert string to ObjectId
+    const query = { _id: new ObjectId(id) };
+
+    const result = await issuesCollection.findOne(query);
+    res.send(result);
+
 });
 
 app.get('/issues/:category', async (req, res) => {
