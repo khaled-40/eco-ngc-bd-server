@@ -115,11 +115,36 @@ app.get('/latest-issues', async (req, res) => {
 })
 
 app.post('/issues', async (req, res) => {
-    const { issuesCollection } = await getCollections();
-    console.log(req.headers)
-    const newIssue = req.body;
-    const result = await issuesCollection.insertOne(newIssue);
-    res.send(result)
+  const { issuesCollection } = await getCollections();
+  console.log(req.headers)
+  const newIssue = req.body;
+  const result = await issuesCollection.insertOne(newIssue);
+  res.send(result)
+})
+
+app.patch('/issues/:id', async (req, res) => {
+  const { issuesCollection } = await getCollections();
+  const id = req.params.id;
+  const newProduct = req.body;
+  const query = { _id: new ObjectId(id) };
+  const update = {
+    $set: {
+      title: newProduct.title,
+      category: newProduct.category,
+      amount: newProduct.amount,
+      description: newProduct.description
+    }
+  };
+  const result = await issuesCollection.updateOne(query, update);
+  res.send(result);
+})
+
+app.delete('/issues/:id', async (req, res) => {
+  const { issuesCollection } = await getCollections();
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await issuesCollection.deleteOne(query)
+  res.send(result)
 })
 
 // Contribution Related APIS 
@@ -139,10 +164,10 @@ app.get('/contributions', async (req, res) => {
 })
 
 app.post('/contributions', async (req, res) => {
-    const { contributionCollection } = await getCollections();
-    const newBid = req.body;
-    const result = await contributionCollection.insertOne(newBid);
-    res.send(result)
+  const { contributionCollection } = await getCollections();
+  const newBid = req.body;
+  const result = await contributionCollection.insertOne(newBid);
+  res.send(result)
 })
 
 
