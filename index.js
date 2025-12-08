@@ -114,6 +114,14 @@ app.get('/latest-issues', async (req, res) => {
   res.send(result);
 })
 
+app.post('/issues', async (req, res) => {
+    const { issuesCollection } = await getCollections();
+    console.log(req.headers)
+    const newIssue = req.body;
+    const result = await issuesCollection.insertOne(newIssue);
+    res.send(result)
+})
+
 // Contribution Related APIS 
 
 app.get('/contributions', async (req, res) => {
@@ -128,6 +136,13 @@ app.get('/contributions', async (req, res) => {
   const cursor = contributionCollection.find(query);
   const result = await cursor.toArray();
   res.send(result);
+})
+
+app.post('/contributions', async (req, res) => {
+    const { contributionCollection } = await getCollections();
+    const newBid = req.body;
+    const result = await contributionCollection.insertOne(newBid);
+    res.send(result)
 })
 
 
