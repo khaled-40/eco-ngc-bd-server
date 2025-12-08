@@ -65,6 +65,21 @@ app.get('/issues', async (req, res) => {
   res.send(result);
 });
 
+app.get('/issues/byEmail', async (req, res) => {
+  console.log(req.query.email)
+  const { issuesCollection } = await getCollections();
+  // console.log('headers', req.headers)
+  const email = req.query.email;
+  const query = {};
+  if (email) {
+    query.email = email
+  }
+  console.log(query)
+  const cursor = issuesCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
 app.get('/issues/:id', async (req, res) => {
 
   const { issuesCollection } = await getCollections();
@@ -78,6 +93,8 @@ app.get('/issues/:id', async (req, res) => {
   res.send(result);
 
 });
+
+
 
 app.get('/issues/:category', async (req, res) => {
   const { category } = req.params;              // Get category from URL
