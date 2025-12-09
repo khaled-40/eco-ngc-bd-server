@@ -170,6 +170,22 @@ app.post('/contributions', async (req, res) => {
   res.send(result)
 })
 
+// User Related APIS 
+app.post('/users', async (req, res) => {
+    const { usersCollection } = await getCollections();
+    const newUser = req.body;
+    const email = req.body.email;
+    const query = { email: email };
+    const existingUser = await usersCollection.findOne(query);
+    if (existingUser) {
+        res.send({ message: 'user already exist' });
+    }
+    else {
+        const result = await usersCollection.insertOne(newUser);
+        res.send(result);
+    }
+})
+
 
 app.listen(port, () => {
   console.log(`eco-ngc-bd server is running on port ${port}`)
