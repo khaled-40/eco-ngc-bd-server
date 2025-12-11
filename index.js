@@ -80,6 +80,9 @@ app.get('/issues/byEmail', async (req, res) => {
   res.send(result);
 })
 
+
+
+
 app.get('/issues/:id', async (req, res) => {
 
   const { issuesCollection } = await getCollections();
@@ -96,16 +99,7 @@ app.get('/issues/:id', async (req, res) => {
 
 
 
-app.get('/issues/:category', async (req, res) => {
-  const { category } = req.params;              // Get category from URL
-  const { issuesCollection } = await getCollections();
 
-  // Find all issues matching the category (case-insensitive)
-  const result = await issuesCollection
-    .find({ category: category })
-    .toArray();
-  res.send(result);
-});
 
 app.get('/latest-issues', async (req, res) => {
   const { issuesCollection } = await getCollections();
@@ -165,9 +159,20 @@ app.get('/contributions', async (req, res) => {
 
 app.post('/contributions', async (req, res) => {
   const { contributionCollection } = await getCollections();
-  const newBid = req.body;
-  const result = await contributionCollection.insertOne(newBid);
+  const newContribution = req.body;
+  const result = await contributionCollection.insertOne(newContribution);
   res.send(result)
+})
+
+app.get('/issue/contributions/:issueId', async (req, res) => {
+    const { contributionCollection } = await getCollections();
+    const issueId = req.params.issueId;
+    console.log(issueId)
+    const query = { issueId: issueId };
+    const cursor = contributionCollection.find(query);
+    const result = await cursor.toArray();
+    result.sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
+    res.send(result);
 })
 
 // User Related APIS 
