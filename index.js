@@ -96,10 +96,41 @@ app.get('/byCategory/:category', async (req, res) => {
   res.send(result);
 })
 
+app.get("/byStatus/:status", async (req, res) => {
+  const { issuesCollection } = await getCollections();
+  // console.log('headers', req.headers)
+  const status = req.params.status;
+  console.log(status)
+  const query = {};
+  if (status) {
+    query.status = status
+  }
+
+  const cursor = issuesCollection.find(query);
+
+  const result = await cursor.toArray();
+
+  res.send(result);
+});
+
+app.get("/byCategoryStatus/:category/:status", async (req, res) => {
+        const { category, status } = req.params;
+
+        const query = {
+            category: category,
+            status: status
+        };
+
+        const result = await issuesCollection.find(query).toArray();
+        res.send(result);
+
+});
+
+
+
 
 app.get('/issues', async (req, res) => {
   const { issuesCollection } = await getCollections();
-  console.log('wrong')
   const cursor = issuesCollection.find();
   const result = await cursor.toArray();
   res.send(result);
@@ -188,30 +219,30 @@ app.post('/contributions', async (req, res) => {
 })
 
 app.get('/issue/contributions/:issueId', async (req, res) => {
-    const { contributionCollection } = await getCollections();
-    const issueId = req.params.issueId;
-    console.log(issueId)
-    const query = { issueId: issueId };
-    const cursor = contributionCollection.find(query);
-    const result = await cursor.toArray();
-    result.sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
-    res.send(result);
+  const { contributionCollection } = await getCollections();
+  const issueId = req.params.issueId;
+  console.log(issueId)
+  const query = { issueId: issueId };
+  const cursor = contributionCollection.find(query);
+  const result = await cursor.toArray();
+  result.sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
+  res.send(result);
 })
 
 // User Related APIS 
 app.post('/users', async (req, res) => {
-    const { usersCollection } = await getCollections();
-    const newUser = req.body;
-    const email = req.body.email;
-    const query = { email: email };
-    const existingUser = await usersCollection.findOne(query);
-    if (existingUser) {
-        res.send({ message: 'user already exist' });
-    }
-    else {
-        const result = await usersCollection.insertOne(newUser);
-        res.send(result);
-    }
+  const { usersCollection } = await getCollections();
+  const newUser = req.body;
+  const email = req.body.email;
+  const query = { email: email };
+  const existingUser = await usersCollection.findOne(query);
+  if (existingUser) {
+    res.send({ message: 'user already exist' });
+  }
+  else {
+    const result = await usersCollection.insertOne(newUser);
+    res.send(result);
+  }
 })
 
 
