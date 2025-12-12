@@ -58,14 +58,9 @@ app.get('/', (req, res) => {
 
 // Issues Related APIS 
 
-app.get('/issues', async (req, res) => {
-  const { issuesCollection } = await getCollections();
-  const cursor = issuesCollection.find();
-  const result = await cursor.toArray();
-  res.send(result);
-});
 
-app.get('/issues/byEmail', async (req, res) => {
+
+app.get('/issues', async (req, res) => {
   console.log(req.query.email)
   const { issuesCollection } = await getCollections();
   // console.log('headers', req.headers)
@@ -74,14 +69,41 @@ app.get('/issues/byEmail', async (req, res) => {
   if (email) {
     query.email = email
   }
-  console.log(query)
+
   const cursor = issuesCollection.find(query);
+
   const result = await cursor.toArray();
+
   res.send(result);
 })
 
 
+app.get('/byCategory/:category', async (req, res) => {
+  console.log(req.query.email)
+  const { issuesCollection } = await getCollections();
+  // console.log('headers', req.headers)
+  const category = req.params.category;
+  console.log(category)
+  const query = {};
+  if (category) {
+    query.category = category
+  }
 
+  const cursor = issuesCollection.find(query);
+
+  const result = await cursor.toArray();
+
+  res.send(result);
+})
+
+
+app.get('/issues', async (req, res) => {
+  const { issuesCollection } = await getCollections();
+  console.log('wrong')
+  const cursor = issuesCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+});
 
 app.get('/issues/:id', async (req, res) => {
 
@@ -119,14 +141,15 @@ app.post('/issues', async (req, res) => {
 app.patch('/issues/:id', async (req, res) => {
   const { issuesCollection } = await getCollections();
   const id = req.params.id;
-  const newProduct = req.body;
+  const newIssue = req.body;
   const query = { _id: new ObjectId(id) };
   const update = {
     $set: {
-      title: newProduct.title,
-      category: newProduct.category,
-      amount: newProduct.amount,
-      description: newProduct.description
+      title: newIssue.title,
+      category: newIssue.category,
+      status: newIssue.status,
+      amount: newIssue.amount,
+      description: newIssue.description
     }
   };
   const result = await issuesCollection.updateOne(query, update);
