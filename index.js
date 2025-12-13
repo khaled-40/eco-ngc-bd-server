@@ -8,10 +8,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// kSpVG5lA7g2rvsTq
-// ecoCleanDB
+
 // mongoDB connection 
-const uri = "mongodb+srv://ecoCleanDB:kSpVG5lA7g2rvsTq@cluster0.uk3n3pp.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uk3n3pp.mongodb.net/?appName=Cluster0`;
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -246,6 +245,7 @@ app.post('/users', async (req, res) => {
 })
 
 
-app.listen(port, () => {
-  console.log(`eco-ngc-bd server is running on port ${port}`)
-})
+// app.listen(port, () => {
+//   console.log(`eco-ngc-bd server is running on port ${port}`)
+// })
+module.exports = app;
